@@ -1,8 +1,139 @@
-byobu (5.124) unreleased; urgency=medium
+byobu (5.128) unreleased; urgency=medium
 
   * UNRELEASED
 
- -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 25 Sep 2017 10:28:42 -0500
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sun, 12 Aug 2018 11:37:11 -0500
+
+byobu (5.127-0ubuntu1) cosmic; urgency=medium
+
+  * usr/share/byobu/profiles/bashrc:
+    - Googley PS1 for non-Ubuntu distros
+  * usr/lib/byobu/logo, usr/share/byobu/profiles/bashrc:
+    - use Google lego logo for gLinux
+  * usr/lib/byobu/logo: LP: #1769676
+    - don't use the Ubuntu logo in the status line, as this breaks ssh
+      clients coming to Ubuntu from other OSes without the Ubuntu font
+  * usr/lib/byobu/include/shutil, usr/lib/byobu/Makefile.am,
+    usr/lib/byobu/rcs_cost, usr/share/byobu/status/status,
+    usr/share/man/man1/byobu.1,
+    usr/lib/byobu/ec2_cost,
+    usr/lib/byobu/include/ec2instancespricing.py,
+    usr/lib/byobu/include/Makefile.am, usr/lib/byobu/include/shutil,
+    usr/lib/byobu/Makefile.am, usr/share/byobu/status/status,
+    usr/share/man/man1/byobu.1,
+  * usr/bin/byobu-janitor.in:
+    - deprecate unmaintained ec2/rcs pricing functionality
+    - this never really worked well, and these prices are constantly changing
+    - clear out stale status cache
+  * debian/control, usr/lib/byobu/ip_address, usr/lib/byobu/network,
+    usr/share/man/man1/wifi-status.1: LP: #1748956
+    - switch entirely to iproute2, away from net-tools and ifconfig
+    - only remaining ifconfig is fall-back logic, in case /sbin/ip is
+      not found
+  * usr/share/byobu/desktop/byobu.desktop: LP: #1739708
+    - update categories so that Byobu can show up in Cinnamon/Mint's
+      preferred applications list
+  * usr/share/byobu/pixmaps/byobu.14.png,
+    usr/share/byobu/pixmaps/byobu.192.png,
+    usr/share/byobu/pixmaps/byobu.64.png,
+    usr/share/byobu/pixmaps/byobu.png:
+    - re-render png's, as Chrome started rendering middle color wrong
+  * usr/bin/byobu-select-profile.in, usr/share/man/man1/byobu-select-
+    profile.1: LP: #1717746
+    - deprecate interactive mode for byobu-select-profile
+  * usr/lib/byobu/include/toggle-utf8.in: LP: #1696546
+    - try to support zsh and other shells in addition to bash
+  * usr/bin/byobu-shell.in:
+    - update getting started to byobu.org
+  * usr/share/byobu/profiles/tmux: LP: #1617689
+    - add a comment about motd printing
+  * usr/share/man/man1/byobu.1: LP: #1618185
+    - update documentation on setting a logo
+  * debian/compat, debian/control:
+  * debian/compat, debian/control, usr/lib/byobu/include/config.py.in,
+    usr/lib/byobu/include/select-session.py:
+    - neverending fight with lintian
+    - hardcode python3 as our interpreter
+  * usr/lib/byobu/include/shutil:
+    - check for lsb-release before using (not present on Debian)
+  * usr/share/byobu/profiles/bashrc:
+    - fix missing bash 256 ps1 colors
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sun, 12 Aug 2018 11:37:06 -0500
+
+byobu (5.126-0ubuntu1) cosmic; urgency=medium
+
+  [ Dustin Kirkland ]
+  * usr/lib/byobu/include/constants, usr/share/byobu/keybindings/f-
+    keys.screen, usr/share/byobu/keybindings/f-keys.tmux:
+    - create a $BYOBU_EDITOR variable, using "sensible-editor" if found
+      (it will be on Debian/Ubuntu systems), or $EDITOR if not, and falling
+      back to "vim" in the case where none are found
+    - use $BYOBU_EDITOR with Shift-F7 to open the printscreen buffer in
+      a new window;  this fixes a bug on some distros where $EDITOR might
+      be undefined
+  * usr/lib/byobu/session:
+    - don't count sessions that start with _
+    - BUG: #892489
+  * usr/lib/byobu/include/shutil, usr/lib/byobu/logo:
+    - add a logo for gLinux
+
+  [ Mark Kelly ]
+  * usr/lib/byobu/updates_available:
+    - Fix rare race condition for update_needed and cache file (#26)
+    - https://github.com/dustinkirkland/byobu/pull/26
+
+  [ Didier Roche ]
+  * byobu.desktop:
+    - give some hints for GNOME Shell to correctly match byobu desktop file
+      (LP: #1718482); partial fix, not entirely working yet
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sun, 27 May 2018 18:07:09 -0500
+
+byobu (5.125-0ubuntu1) bionic; urgency=medium
+
+  [ Jean-Baptiste Lallement ]
+  * usr/share/byobu/profiles/dircolors: LP: #1752352
+    - fix blinking symlinks
+
+  [ Chow Loong Jin ]
+  * usr/lib/byobu/include/select-session.py:
+   - Fix cull_zombies() so that we properly cull zombies of sessions that
+     have non-numeric session names
+   - Allow the dynamic session-creation behaviour to be disabled by
+     creating ~/.byobu/.reuse-session
+
+  [ Dustin Kirkland ]
+  * debian/control:
+    - need sensible-utils
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 16 Mar 2018 10:09:55 -0700
+
+byobu (5.124-0ubuntu1) bionic; urgency=medium
+
+  [ Dustin Kirkland ]
+  * usr/bin/wifi-status:
+    - add a speedometer split
+  * debian/control, usr/bin/wifi-status,
+    usr/share/byobu/profiles/bashrc:
+    - kill the double bracket;  doesn't always print nicely
+  * === added directory snap, snap/snapcraft.yaml:
+    - initial crack at snap packaging
+
+  [ Ari Pollak ]
+  * usr/lib/byobu/include/select-session.py:
+    - Fix culling sessions with named groups (#25)
+    - https://github.com/dustinkirkland/byobu/pull/25
+
+  [ Charles Alva ]
+  * usr/bin/purge-old-kernels:
+    - make sure we pass through the -f|-y apt options
+
+  [ Matthias Klose ]
+  * Build-depend on dh-python.
+  * Drop the alternative python2 dependencies. LP: #1735348.
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 04 Dec 2017 07:46:46 -0600
 
 byobu (5.123-0ubuntu1) artful; urgency=medium
 

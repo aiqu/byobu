@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 #    select-session.py
 #    Copyright (C) 2010 Canonical Ltd.
@@ -40,6 +40,7 @@ BYOBU_BACKEND = os.getenv("BYOBU_BACKEND", "tmux")
 choice = -1
 sessions = []
 text = []
+reuse_sessions = os.path.exists("%s/.reuse-session" % (BYOBU_CONFIG_DIR))
 
 BYOBU_UPDATE_ENVVARS = ["DISPLAY", "DBUS_SESSION_BUS_ADDRESS", "SESSION_MANAGER", "GPG_AGENT_INFO", "XDG_SESSION_COOKIE", "XDG_SESSION_PATH", "GNOME_KEYRING_CONTROL", "GNOME_KEYRING_PID", "GPG_AGENT_INFO", "SSH_ASKPASS", "SSH_AUTH_SOCK", "SSH_AGENT_PID", "WINDOWID", "UPSTART_JOB", "UPSTART_EVENTS", "UPSTART_SESSION", "UPSTART_INSTANCE"]
 
@@ -99,10 +100,10 @@ def cull_zombies(session_name):
 		if not output:
 			return
 
-		# Find the master session to extract the group number. We use
+		# Find the master session to extract the group name. We use
 		# the group number to be extra sure the right session is getting
 		# killed. We don't want to accidentally kill the wrong one
-		pattern = "^%s:.+\\((group \\d+)\\).*$" % session_name
+		pattern = "^%s:.+\\((group [^\\)]+)\\).*$" % session_name
 		master = re.search(pattern, output, re.MULTILINE)
 		if not master:
 			return
@@ -131,7 +132,11 @@ def attach_session(session):
 	cull_zombies(session_name)
 	# must use the binary, not the wrapper!
 	if backend == "tmux":
-		os.execvp("tmux", ["tmux", "-2", "attach-session", "-t", session_name])
+		if reuse_sessions:
+			os.execvp("tmux", ["tmux", "attach", "-t", session_name])
+		else:
+			os.execvp("tmux", ["tmux", "-2", "new-session", "-t", session_name, "-s", "_%s-%i" % (session_name, os.getpid())])
+
 	else:
 		os.execvp("screen", ["screen", "-AOxRR", session_name])
 
